@@ -68,7 +68,7 @@ let state = {
     products: JSON.parse(localStorage.getItem('mobishop_products')) || INITIAL_PRODUCTS,
     cart: JSON.parse(localStorage.getItem('mobishop_cart')) || [],
     orders: JSON.parse(localStorage.getItem('mobishop_orders')) || [],
-    admins: JSON.parse(localStorage.getItem('mobishop_admins')) || [{ username: 'admin', password: '123456' }],
+    admins: (JSON.parse(localStorage.getItem('mobishop_admins')) || [{ username: 'haoln.24th@sv.dla.edu.vn', password: '123' }]).slice(0, 1),
     currentView: 'home',
     adminTab: 'overview',
     isAdmin: localStorage.getItem('mobishop_isAdmin') === 'true',
@@ -161,8 +161,13 @@ const handleAdminLogin = (e) => {
     const user = document.getElementById('admin-user').value;
     const pass = document.getElementById('admin-pass').value;
     
-    const admin = state.admins.find(a => a.username === user && a.password === pass);
-    if (admin) {
+    // Tài khoản cố định theo yêu cầu người dùng
+    const REQUIRED_USER = 'haoln.24th@sv.dla.edu.vn';
+    const REQUIRED_PASS = '123';
+    
+    if (user === REQUIRED_USER && pass === REQUIRED_PASS) {
+        // Cập nhật lại state đảm bảo đồng bộ
+        state.admins[0] = { username: REQUIRED_USER, password: REQUIRED_PASS };
         state.isAdmin = true;
         saveState();
         state.currentView = 'admin-dashboard';
@@ -224,9 +229,6 @@ const render = () => {
             break;
         case 'admin-login':
             html += renderAdminLogin();
-            break;
-        case 'admin-register':
-            html += renderAdminRegister();
             break;
         case 'admin-dashboard':
             html += renderAdminDashboard();
@@ -558,10 +560,10 @@ const renderAdminLogin = () => `
                 <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
                     Đăng nhập ngay
                 </button>
-                <div class="text-center">
-                    <p class="text-sm text-gray-500">Chưa có tài khoản? <button onclick="navigateTo('admin-register')" class="text-blue-600 font-bold hover:underline">Đăng ký ngay</button></p>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
+                    <p class="text-[10px] text-blue-600 font-bold text-center uppercase tracking-wider">Tài khoản quản trị đã được thiết lập sẵn</p>
                 </div>
-                <button type="button" onclick="navigateTo('home')" class="w-full text-gray-400 font-bold hover:text-gray-600 transition-colors">
+                <button type="button" onclick="navigateTo('home')" class="w-full text-gray-400 font-bold hover:text-gray-600 transition-colors mt-4">
                     Quay lại trang chủ
                 </button>
             </form>
@@ -569,39 +571,81 @@ const renderAdminLogin = () => `
     </div>
 `;
 
-const renderAdminRegister = () => `
-    <div class="container mx-auto px-4 py-24">
-        <div class="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <div class="text-center mb-10">
-                <div class="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
-                    <i class="fas fa-user-plus text-white text-2xl"></i>
-                </div>
-                <h2 class="text-3xl font-black text-gray-900">Admin Register</h2>
-                <p class="text-gray-400">Tạo tài khoản quản trị mới</p>
+const renderAdminSettings = () => `
+    <div class="max-w-2xl bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center text-blue-600">
+                <i class="fas fa-user-shield"></i>
             </div>
-            <form onsubmit="handleAdminRegister(event)" class="space-y-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">Tài khoản quản trị</h3>
+                <p class="text-sm text-gray-400">Quản lý thông tin đăng nhập duy nhất</p>
+            </div>
+        </div>
+        
+        <form onsubmit="handlePasswordChange(event)" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2">Tên đăng nhập</label>
+                <input type="text" value="${state.admins[0].username}" disabled class="w-full bg-gray-100 border-none rounded-xl px-4 py-3 outline-none text-gray-400 cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2">Mật khẩu hiện tại</label>
+                <input type="password" id="current-pass" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-500 mb-2">Tài khoản</label>
-                    <input type="text" id="reg-user" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Mật khẩu mới</label>
+                    <input type="password" id="new-pass" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-500 mb-2">Mật khẩu</label>
-                    <input type="password" id="reg-pass" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="confirm-new-pass" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-500 mb-2">Xác nhận mật khẩu</label>
-                    <input type="password" id="reg-confirm" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
-                    Đăng ký tài khoản
-                </button>
-                <div class="text-center">
-                    <p class="text-sm text-gray-500">Đã có tài khoản? <button onclick="navigateTo('admin-login')" class="text-indigo-600 font-bold hover:underline">Đăng nhập</button></p>
-                </div>
-            </form>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                Cập nhật mật khẩu
+            </button>
+        </form>
+        
+        <div class="mt-12 pt-8 border-t border-gray-100">
+            <div class="bg-red-50 p-6 rounded-3xl border border-red-100">
+                <h4 class="text-red-600 font-bold mb-2 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i> Lưu ý bảo mật
+                </h4>
+                <p class="text-xs text-red-500 leading-relaxed">Hệ thống này được thiết kế để chỉ có <b>duy nhất một người quản trị</b>. Việc đăng ký tài khoản mới đã bị vô hiệu hóa để đảm bảo an toàn tối đa cho cửa hàng của bạn.</p>
+            </div>
         </div>
     </div>
 `;
+
+const handlePasswordChange = (e) => {
+    e.preventDefault();
+    const currentPass = document.getElementById('current-pass').value;
+    const newPass = document.getElementById('new-pass').value;
+    const confirmPass = document.getElementById('confirm-new-pass').value;
+    
+    const admin = state.admins[0];
+    
+    if (currentPass !== admin.password) {
+        showToast('Mật khẩu hiện tại không đúng', 'error');
+        return;
+    }
+    
+    if (newPass !== confirmPass) {
+        showToast('Mật khẩu mới không khớp', 'error');
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        showToast('Mật khẩu phải có ít nhất 6 ký tự', 'error');
+        return;
+    }
+    
+    admin.password = newPass;
+    saveState();
+    showToast('Đã đổi mật khẩu thành công!');
+    render();
+};
 
 const renderAdminDashboard = () => {
     const totalRevenue = state.orders.reduce((s, o) => o.status === 'completed' ? s + o.total : s, 0);
@@ -630,6 +674,9 @@ const renderAdminDashboard = () => {
                         </div>
                         ${pendingCount > 0 ? `<span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">${pendingCount}</span>` : ''}
                     </button>
+                    <button onclick="state.adminTab = 'settings'; render()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'settings' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-50'}">
+                        <i class="fas fa-cog"></i> Cài đặt
+                    </button>
                 </nav>
                 <div class="p-4 border-t border-gray-100 space-y-2">
                     <button onclick="navigateTo('home')" class="w-full flex items-center gap-3 px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-xl transition-all font-bold">
@@ -648,6 +695,7 @@ const renderAdminDashboard = () => {
                         ${state.adminTab === 'overview' ? 'Bảng điều khiển' : ''}
                         ${state.adminTab === 'products' ? 'Quản lý sản phẩm' : ''}
                         ${state.adminTab === 'orders' ? 'Quản lý đơn hàng' : ''}
+                        ${state.adminTab === 'settings' ? 'Cài đặt hệ thống' : ''}
                     </h2>
                     <div class="flex items-center gap-4">
                         <div class="text-right">
@@ -661,6 +709,7 @@ const renderAdminDashboard = () => {
                 ${state.adminTab === 'overview' ? renderAdminOverview(totalRevenue, pendingCount) : ''}
                 ${state.adminTab === 'products' ? renderAdminProducts() : ''}
                 ${state.adminTab === 'orders' ? renderAdminOrders() : ''}
+                ${state.adminTab === 'settings' ? renderAdminSettings() : ''}
             </main>
         </div>
     `;
@@ -805,28 +854,6 @@ const renderAdminProducts = () => `
     </div>
 `;
 
-const handleAdminRegister = (e) => {
-    e.preventDefault();
-    const user = document.getElementById('reg-user').value;
-    const pass = document.getElementById('reg-pass').value;
-    const confirm = document.getElementById('reg-confirm').value;
-    
-    if (pass !== confirm) {
-        showToast('Mật khẩu xác nhận không khớp', 'error');
-        return;
-    }
-    
-    if (state.admins.find(a => a.username === user)) {
-        showToast('Tài khoản đã tồn tại', 'error');
-        return;
-    }
-    
-    state.admins.push({ username: user, password: pass });
-    saveState();
-    showToast('Đăng ký tài khoản Admin thành công!');
-    navigateTo('admin-login');
-};
-
 const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -961,5 +988,13 @@ const attachEventListeners = () => {
 
 // --- Khởi tạo ứng dụng ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Luôn đảm bảo tài khoản admin là tài khoản bạn yêu cầu
+    const REQUIRED_USER = 'haoln.24th@sv.dla.edu.vn';
+    const REQUIRED_PASS = '123';
+    
+    if (state.admins[0].username !== REQUIRED_USER || state.admins[0].password !== REQUIRED_PASS) {
+        state.admins[0] = { username: REQUIRED_USER, password: REQUIRED_PASS };
+        saveState();
+    }
     render();
 });
