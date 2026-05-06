@@ -1,6 +1,6 @@
 {
-  "name": "MobiShop - Cửa Hàng Điện Thoại Hiện Đại",
-  "description": "Website bán lẻ điện thoại di động với đầy đủ tính năng giỏ hàng, tìm kiếm và trang quản trị admin.",
+  "name": "PhoneStore - Hệ thống bán lẻ điện thoại hiện đại",
+  "description": "Website bán lẻ điện thoại hoàn chỉnh với tính năng giỏ hàng, tìm kiếm, xem chi tiết và trang quản trị admin chuyên nghiệp.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
